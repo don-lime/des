@@ -1111,7 +1111,7 @@ fn desAssert(des_tests: []const DesTest) !void {
 fn tripleDesAssert(triple_des_tests: []const TripleDesTest) !void {
     var triple_des = Des.TripleDes.init();
     for (triple_des_tests) |t| {
-        var key = Des.TripleDesKey.initFromHex(t.key);
+        const key = Des.TripleDesKey.initFromHex(t.key);
         var ivBuf: [8]u8 = undefined;
         var iv: ?[]const u8 = null;
         if (t.iv) |value| {
