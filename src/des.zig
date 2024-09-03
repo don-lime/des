@@ -109,7 +109,7 @@ pub const Des = struct {
         var right: u32 = @truncate(sum);
 
         for (0..16) |i| {
-            var exp: u64 = permute(&self.exp, right, 32) ^ subkeys[if (enc) i else (15 - i)];
+            const exp: u64 = permute(&self.exp, right, 32) ^ subkeys[if (enc) i else (15 - i)];
             var sbox: u32 = 0;
             for (0..8) |s| {
                 sbox = sbox << 4 | self.sbox[s][(exp >> ((48 - (@as(u6, @truncate(s)) * 6)) - 6)) & 63];
@@ -152,14 +152,14 @@ pub const Des = struct {
                 }
             }
             switch (endian) {
-                .Big => {
+                .big => {
                     pt = des.encryptBlock(dks.subkeys, pt);
                 },
-                .Little => {
+                .little => {
                     pt = @byteSwap(des.encryptBlock(dks.subkeys, pt));
                 },
             }
-            std.mem.copy(u8, self.cipher[(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+            @memcpy(self.cipher[(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
         }
     }
 
@@ -190,10 +190,10 @@ pub const Des = struct {
                     }
                 }
             }
-            if (endian == .Little) {
+            if (endian == .little) {
                 pt = @byteSwap(pt);
             }
-            std.mem.copy(u8, self.cipher[((self.block_sum - (block + 1)) * 8)..(((self.block_sum - (block + 1)) * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+            @memcpy(self.cipher[((self.block_sum - (block + 1)) * 8)..(((self.block_sum - (block + 1)) * 8) + 8)], &@as([8]u8, @bitCast(pt)));
         }
     }
 };
@@ -266,10 +266,10 @@ pub const TripleDes = struct {
                             unreachable;
                         },
                     }
-                    if (endian == .Little) {
+                    if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    std.mem.copy(u8, self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             } else {
                 for (tk.key, 0..) |_, k| {
@@ -292,10 +292,10 @@ pub const TripleDes = struct {
                             unreachable;
                         },
                     }
-                    if (endian == .Little) {
+                    if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    std.mem.copy(u8, self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             }
         }
@@ -329,10 +329,10 @@ pub const TripleDes = struct {
                             unreachable;
                         },
                     }
-                    if (endian == .Little) {
+                    if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    std.mem.copy(u8, self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             } else {
                 for (tk.key, 0..) |_, k| {
@@ -361,10 +361,10 @@ pub const TripleDes = struct {
                             unreachable;
                         },
                     }
-                    if (endian == .Little) {
+                    if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    std.mem.copy(u8, self.cipher[k][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[k][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             }
         }
@@ -388,10 +388,10 @@ pub const TripleDesKey = struct {
 
 fn bytesToUint64(buf: []const u8) u64 {
     switch (endian) {
-        .Big => {
+        .big => {
             return @as(u64, @bitCast(buf[0..8].*));
         },
-        .Little => {
+        .little => {
             return @byteSwap(@as(u64, @bitCast(buf[0..8].*)));
         },
     }
