@@ -245,9 +245,9 @@ pub const TripleDes = struct {
         for (0..self.blk_count) |block| {
             var pt: u64 = undefined;
             if (block == 0) {
-                for (tk.key, 0..) |_, k| {
-                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[k]));
-                    switch (k) {
+                for (tk.key, 0..) |_, tki| {
+                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[tki]));
+                    switch (tki) {
                         0 => {
                             pt = bytesToUint64(buf[(block * 8)..((block * 8) + 8)]);
                             if (iv) |value| {
@@ -257,10 +257,10 @@ pub const TripleDes = struct {
                             pt = des.encryptBlock(dks.subkeys, pt);
                         },
                         1 => {
-                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][0..8]));
+                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][0..8]));
                         },
                         2 => {
-                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][0..8]));
+                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][0..8]));
                         },
                         else => {
                             unreachable;
@@ -269,12 +269,12 @@ pub const TripleDes = struct {
                     if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    @memcpy(self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[tki][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             } else {
-                for (tk.key, 0..) |_, k| {
-                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[k]));
-                    switch (k) {
+                for (tk.key, 0..) |_, tki| {
+                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[tki]));
+                    switch (tki) {
                         0 => {
                             pt = bytesToUint64(buf[(block * 8)..((block * 8) + 8)]);
                             if (iv) |_| {
@@ -283,10 +283,10 @@ pub const TripleDes = struct {
                             pt = des.encryptBlock(dks.subkeys, pt);
                         },
                         1 => {
-                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][(block * 8)..((block * 8) + 8)]));
+                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][(block * 8)..((block * 8) + 8)]));
                         },
                         2 => {
-                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][(block * 8)..((block * 8) + 8)]));
+                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][(block * 8)..((block * 8) + 8)]));
                         },
                         else => {
                             unreachable;
@@ -295,7 +295,7 @@ pub const TripleDes = struct {
                     if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    @memcpy(self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[tki][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             }
         }
@@ -309,17 +309,17 @@ pub const TripleDes = struct {
         for (0..self.blk_count) |block| {
             var pt: u64 = undefined;
             if (self.blk_count == 1) {
-                for (tk.key, 0..) |_, k| {
-                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[2 - k]));
-                    switch (k) {
+                for (tk.key, 0..) |_, tki| {
+                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[2 - tki]));
+                    switch (tki) {
                         0 => {
                             pt = des.decryptBlock(dks.subkeys, bytesToUint64(buf[0..8]));
                         },
                         1 => {
-                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][0..8]));
+                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][0..8]));
                         },
                         2 => {
-                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][0..8]));
+                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][0..8]));
                             if (iv) |value| {
                                 const xorValue: u64 = bytesToUint64(value);
                                 pt ^= xorValue;
@@ -332,20 +332,20 @@ pub const TripleDes = struct {
                     if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    @memcpy(self.cipher[k][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[tki][(block * 8)..((block * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             } else {
-                for (tk.key, 0..) |_, k| {
-                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[2 - k]));
-                    switch (k) {
+                for (tk.key, 0..) |_, tki| {
+                    const dks: DesKeySchedule = DesKeySchedule.init(bytesToUint64(&tk.key[2 - tki]));
+                    switch (tki) {
                         0 => {
                             pt = des.decryptBlock(dks.subkeys, bytesToUint64(buf[((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)]));
                         },
                         1 => {
-                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)]));
+                            pt = des.encryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)]));
                         },
                         2 => {
-                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[k - 1][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)]));
+                            pt = des.decryptBlock(dks.subkeys, bytesToUint64(self.cipher[tki - 1][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)]));
                             if (self.blk_count - (block + 1) > 0) {
                                 if (iv) |_| {
                                     pt ^= bytesToUint64(buf[(((self.blk_count - (block + 1)) - 1) * 8)..((((self.blk_count - (block + 1)) - 1) * 8) + 8)]);
@@ -364,7 +364,7 @@ pub const TripleDes = struct {
                     if (endian == .little) {
                         pt = @byteSwap(pt);
                     }
-                    @memcpy(self.cipher[k][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)], &@as([8]u8, @bitCast(pt)));
+                    @memcpy(self.cipher[tki][((self.blk_count - (block + 1)) * 8)..(((self.blk_count - (block + 1)) * 8) + 8)], &@as([8]u8, @bitCast(pt)));
                 }
             }
         }
