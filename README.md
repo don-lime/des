@@ -12,3 +12,5 @@
 - https://en.wikipedia.org/wiki/Data_Encryption_Standard
 - https://en.wikipedia.org/wiki/Triple_DES
 - https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+
+**Zig version compatible: 0.15.2**
