@@ -12,7 +12,7 @@ pub const Des = struct {
     p: [32]u8,
     fp: [64]u8,
 
-    cipher: [1024]u8,
+    cipher: [24]u8,
     block_sum: usize,
 
     pub fn init() Self {
@@ -227,7 +227,7 @@ pub const DesKeySchedule = struct {
 
 pub const TripleDes = struct {
     const Self = @This();
-    cipher: [3][1024]u8,
+    cipher: [3][24]u8,
     blk_count: usize,
 
     pub fn init() Self {
